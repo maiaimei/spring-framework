@@ -19,6 +19,13 @@ ext {
 
 configure(allprojects) { project ->
 	repositories {
+		mavenLocal()
+		maven { name 'central'; url 'https://maven.aliyun.com/repository/central' }
+		maven { name 'public'; url 'https://maven.aliyun.com/repository/public' }
+		maven { name 'google'; url 'https://maven.aliyun.com/repository/google' }
+		maven { name 'spring'; url 'https://maven.aliyun.com/repository/spring' }
+		maven { name 'grails-core'; url 'https://maven.aliyun.com/repository/grails-core' }
+		maven { name 'apache snapshots'; url 'https://maven.aliyun.com/repository/apache-snapshots' }
 		mavenCentral()
 		maven {
 			url "https://repo.spring.io/milestone"
@@ -48,7 +55,7 @@ configure([rootProject] + javaProjects) { project ->
 
 	apply plugin: "java"
 	apply plugin: "java-test-fixtures"
-	apply plugin: 'org.springframework.build.conventions'
+	//apply plugin: 'org.springframework.build.conventions' // PluginApplicationException???
 	apply from: "${rootDir}/gradle/toolchains.gradle"
 	apply from: "${rootDir}/gradle/ide.gradle"
 
