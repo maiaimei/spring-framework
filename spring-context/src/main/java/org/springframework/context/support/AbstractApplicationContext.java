@@ -562,6 +562,13 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 
 				StartupStep beanPostProcess = this.applicationStartup.start("spring.context.beans.post-process");
 				// Invoke factory processors registered as beans in the context.
+				// 1.先实例化实现了 PriorityOrdered 接口的 BeanDefinitionRegistryPostProcessor 
+				//   并执行 postProcessBeanDefinitionRegistry 方法
+				// 2.实例化实现了 Ordered 接口的 BeanDefinitionRegistryPostProcessor 
+				//   并执行 postProcessBeanDefinitionRegistry 方法
+				// 3.实例化剩余的 BeanDefinitionRegistryPostProcessor 
+				//   并执行 postProcessBeanDefinitionRegistry 方法
+				// 4.调用 BeanFactoryPostProcess 的 postProcessBeanFactory 方法
 				invokeBeanFactoryPostProcessors(beanFactory);
 
 				// Register bean processors that intercept bean creation.
@@ -632,6 +639,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 		}
 
 		// Initialize any placeholder property sources in the context environment.
+		// 初始化上下文环境中的任何占位符属性源。
 		initPropertySources();
 
 		// Validate that all properties marked as required are resolvable:

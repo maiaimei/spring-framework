@@ -301,6 +301,9 @@ class ConfigurationClassParser {
 		}
 
 		// Process any @Import annotations
+		// 导入实现了ImportSelector接口的类
+		// 导入实现了ImportBeanDefinitionRegistrar接口的类
+		// 导入普通类
 		processImports(configClass, sourceClass, getImports(sourceClass), filter, true);
 
 		// Process any @ImportResource annotations
