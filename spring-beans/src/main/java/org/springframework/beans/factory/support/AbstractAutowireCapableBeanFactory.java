@@ -506,6 +506,9 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 
 		try {
 			// Give BeanPostProcessors a chance to return a proxy instead of the target bean instance.
+			// 这里可能会应用到后置处理器
+			// InstantiationAwareBeanPostProcessor#postProcessBeforeInstantiation
+			// InstantiationAwareBeanPostProcessor#postProcessAfterInitialization
 			Object bean = resolveBeforeInstantiation(beanName, mbdToUse);
 			if (bean != null) {
 				return bean;
@@ -594,6 +597,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		// Initialize the bean instance.
 		Object exposedObject = bean;
 		try {
+			// 属性注入
 			populateBean(beanName, mbd, instanceWrapper);
 			exposedObject = initializeBean(beanName, exposedObject, mbd);
 		}
@@ -989,6 +993,9 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 				// Mark this bean as currently in creation, even if just partially.
 				beforeSingletonCreation(beanName);
 				// Give BeanPostProcessors a chance to return a proxy instead of the target bean instance.
+				// 这里可能会应用到后置处理器
+				// InstantiationAwareBeanPostProcessor#postProcessBeforeInstantiation
+				// InstantiationAwareBeanPostProcessor#postProcessAfterInitialization
 				instance = resolveBeforeInstantiation(beanName, mbd);
 				if (instance == null) {
 					bw = createBeanInstance(beanName, mbd, null);
@@ -1044,6 +1051,9 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 			// Mark this bean as currently in creation, even if just partially.
 			beforePrototypeCreation(beanName);
 			// Give BeanPostProcessors a chance to return a proxy instead of the target bean instance.
+			// 这里可能会应用到后置处理器
+			// InstantiationAwareBeanPostProcessor#postProcessBeforeInstantiation
+			// InstantiationAwareBeanPostProcessor#postProcessAfterInitialization
 			instance = resolveBeforeInstantiation(beanName, mbd);
 			if (instance == null) {
 				BeanWrapper bw = createBeanInstance(beanName, mbd, null);
