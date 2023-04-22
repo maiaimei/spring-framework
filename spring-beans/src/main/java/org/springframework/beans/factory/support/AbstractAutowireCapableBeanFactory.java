@@ -560,6 +560,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 			instanceWrapper = this.factoryBeanInstanceCache.remove(beanName);
 		}
 		if (instanceWrapper == null) {
+			// 实例化bean
 			instanceWrapper = createBeanInstance(beanName, mbd, args);
 		}
 		Object bean = instanceWrapper.getWrappedInstance();
@@ -591,6 +592,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 				logger.trace("Eagerly caching bean '" + beanName +
 						"' to allow for resolving potential circular references");
 			}
+			// 将bean创建工厂放入三级缓存中，以便后面有机会创建代理对象
 			addSingletonFactory(beanName, () -> getEarlyBeanReference(beanName, mbd, bean));
 		}
 
@@ -599,6 +601,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		try {
 			// 属性注入
 			populateBean(beanName, mbd, instanceWrapper);
+			// 执行初始化方法，这里有可能会返回代理对象
 			exposedObject = initializeBean(beanName, exposedObject, mbd);
 		}
 		catch (Throwable ex) {
@@ -614,6 +617,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 			Object earlySingletonReference = getSingleton(beanName, false);
 			if (earlySingletonReference != null) {
 				if (exposedObject == bean) {
+					// A依赖B，B依赖C，C依赖A，C依赖的是二级缓存的A，这里需要将二级缓存的A返回
 					exposedObject = earlySingletonReference;
 				}
 				else if (!this.allowRawInjectionDespiteWrapping && hasDependentBean(beanName)) {
@@ -953,6 +957,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		Object exposedObject = bean;
 		if (!mbd.isSynthetic() && hasInstantiationAwareBeanPostProcessors()) {
 			for (SmartInstantiationAwareBeanPostProcessor bp : getBeanPostProcessorCache().smartInstantiationAware) {
+				// AbstractAutoProxyCreator#getEarlyBeanReference
 				exposedObject = bp.getEarlyBeanReference(exposedObject, beanName);
 			}
 		}
@@ -1769,10 +1774,14 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 
 		Object wrappedBean = bean;
 		if (mbd == null || !mbd.isSynthetic()) {
+			// 初始化前，BeanPostProcessor#postProcessBeforeInitialization
 			wrappedBean = applyBeanPostProcessorsBeforeInitialization(wrappedBean, beanName);
 		}
 
 		try {
+			// 初始化
+			// InitializingBean#afterPropertiesSet
+			// @Bean#initMethod
 			invokeInitMethods(beanName, wrappedBean, mbd);
 		}
 		catch (Throwable ex) {
@@ -1780,6 +1789,9 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 					(mbd != null ? mbd.getResourceDescription() : null), beanName, ex.getMessage(), ex);
 		}
 		if (mbd == null || !mbd.isSynthetic()) {
+			// 初始化后，BeanPostProcessor#postProcessAfterInitialization
+			// 这里有可能返回代理对象，详见
+			// AnnotationAwareAspectJAutoProxyCreator -> AbstractAutoProxyCreator#postProcessAfterInitialization
 			wrappedBean = applyBeanPostProcessorsAfterInitialization(wrappedBean, beanName);
 		}
 
